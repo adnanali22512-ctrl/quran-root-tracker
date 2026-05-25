@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quranic Root Word Tracker</title>
-    <!-- Tailwind CSS for Modern Dark UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
@@ -13,39 +12,34 @@
 </head>
 <body class="bg-[#0B0F19] text-white min-h-screen p-4 md:p-8">
 
-    <!-- Main Container -->
     <div class="max-w-4xl mx-auto">
         
-        <!-- Header -->
         <header class="text-center my-10">
             <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-4">
                 قرآنی الفاظ کی جڑ (Root Word Tracker)
             </h1>
             <p class="text-gray-400">Pure Quran ke root words ka live open-source data aur unke derivatives (words) check karein.</p>
-            <!-- Loading Status Indicator -->
+            
             <div id="loadingStatus" class="mt-4 text-sm text-yellow-400 font-semibold bg-yellow-400/10 inline-block px-4 py-1 rounded-full border border-yellow-400/20">
                 🔄 Quranic Data Load ho raha hai, bara-e-meharbani intezar karein...
             </div>
         </header>
 
-        <!-- Search Bar Section -->
         <div class="bg-slate-900/60 border border-gray-800 p-6 rounded-2xl shadow-xl mb-8">
-            <label class="block text-gray-400 mb-2 text-sm">Root Letters likhein (Chahe spaces ke sath ya bina spaces ke, jaise: عرض ya ع ر ض):</label>
+            <label class="block text-gray-400 mb-2 text-sm">Root Letters likhein (Jaise: علم ya ع ل م ya كتب):</label>
             <div class="flex gap-4">
-                <input type="text" id="searchInput" placeholder="مثال: عرض یا کتب" 
+                <input type="text" id="searchInput" placeholder="مثال: علم، كتب، ارض" 
                        class="w-full bg-slate-950 border border-gray-700 rounded-xl px-4 py-3 text-right text-xl focus:outline-none focus:border-cyan-500 transition text-emerald-400 font-bold">
                 <button onclick="searchRoot()" id="searchBtn" disabled
                         class="bg-gradient-to-l from-emerald-500 to-cyan-500 opacity-50 cursor-not-allowed text-slate-900 font-bold px-8 py-3 rounded-xl transition text-lg">
                     تلاش کریں
                 </button>
             </div>
-            <p id="errorMsg" class="text-red-400 text-sm mt-2 hidden">Afsoos! Yeh root word data mein nahi mila. Dobara sahi spelling ke sath try karein.</p>
+            <p id="errorMsg" class="text-red-400 text-sm mt-2 hidden">Afsoos! Yeh root word data mein nahi mila. (Mashwara: 'علم' ya 'كتب' ya 'ارض' try karein)</p>
         </div>
 
-        <!-- Result Dashboard (Hidden by default) -->
         <div id="resultDashboard" class="hidden space-y-6">
             
-            <!-- Quick Stats Top Bar -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-slate-900/40 border border-gray-800/80 p-4 rounded-xl text-center">
                     <p class="text-xs text-gray-500 mb-1">Selected Root (جڑ)</p>
@@ -57,15 +51,11 @@
                 </div>
             </div>
 
-            <!-- Meanings & Words Section -->
             <div class="grid grid-cols-1 gap-6">
-                <!-- Derived Words List from Quran -->
                 <div class="bg-slate-900/50 border border-gray-800 p-6 rounded-xl">
                     <h4 class="text-lg font-bold text-cyan-400 border-b border-gray-800 pb-2 mb-4 text-right">Is Root se banne wale Quranic Alfaaz (Derivatives):</h4>
-                    <!-- Dynamic tag container -->
-                    <div id="wordsContainer" class="flex flex-wrap gap-2 justify-start direction-ltr" style="direction: ltr;">
-                        <!-- Words will be injected here dynamically -->
-                    </div>
+                    <div id="wordsContainer" class="flex flex-wrap gap-2 justify-start" style="direction: ltr;">
+                        </div>
                 </div>
             </div>
 
@@ -73,12 +63,18 @@
 
     </div>
 
-    <!-- JavaScript & Live API Connection -->
     <script>
-        // Global variable to hold the downloaded dataset
         let fullQuranData = null;
 
-        // 1. Fetching the data automatically on page load from CDN
+        // Arabic cleaning function (Removes Zabar, Zer, Pesh, Tashdeed etc.)
+        function cleanArabicText(text) {
+            return text
+                .replace(/[\u064B-\u0652]/g, "") // Removes harakat (diacritics)
+                .replace(/\s+/g, "")             // Removes all spaces
+                .trim();
+        }
+
+        // Fetching data from GitHub CDN
         window.addEventListener('DOMContentLoaded', () => {
             fetch('https://cdn.jsdelivr.net/gh/AbstractThinker0/quran-roots@main/quranRoots.json')
                 .then(response => {
@@ -88,13 +84,9 @@
                 .then(data => {
                     fullQuranData = data;
                     
-                    // UI Changes after data successfully loads
                     document.getElementById("loadingStatus").innerHTML = "✅ Live Quranic Database Connect Ho Gaya Hai!";
-                    document.getElementById("loadingStatus").classList.replace("text-yellow-400", "text-emerald-400");
-                    document.getElementById("loadingStatus").classList.replace("bg-yellow-400/10", "bg-emerald-400/10");
-                    document.getElementById("loadingStatus").classList.replace("border-yellow-400/20", "border-emerald-400/20");
+                    document.getElementById("loadingStatus").className = "mt-4 text-sm text-emerald-400 font-semibold bg-emerald-400/10 inline-block px-4 py-1 rounded-full border border-emerald-400/20";
                     
-                    // Enable the Search Button
                     const btn = document.getElementById("searchBtn");
                     btn.disabled = false;
                     btn.classList.remove("opacity-50", "cursor-not-allowed");
@@ -102,66 +94,53 @@
                 .catch(error => {
                     console.error("Data load karne mein masla:", error);
                     document.getElementById("loadingStatus").innerHTML = "❌ Data load nahi ho saka. Page refresh karein.";
-                    document.getElementById("loadingStatus").classList.replace("text-yellow-400", "text-red-400");
+                    document.getElementById("loadingStatus").className = "mt-4 text-sm text-red-400 font-semibold bg-red-400/10 inline-block px-4 py-1 rounded-full border border-red-400/20";
                 });
         });
 
-        // 2. Comprehensive Search Logic
+        // Smart Search Function
         function searchRoot() {
             if (!fullQuranData) return;
 
-            let input = document.getElementById("searchInput").value.trim();
+            let userInput = document.getElementById("searchInput").value;
             const resultDashboard = document.getElementById("resultDashboard");
             const errorMsg = document.getElementById("errorMsg");
             const wordsContainer = document.getElementById("wordsContainer");
 
-            if (input === "") return;
-
-            // Clean data helpers: standardizing user input with or without spaces
-            let searchKeyWithSpaces = input.split('').filter(char => char.trim() !== '').join(' ');
-            let searchKeyNoSpaces = input.replace(/\s+/g, '');
+            // Clean the user input (No spaces, no harakat)
+            let cleanInput = cleanArabicText(userInput);
+            if (cleanInput === "") return;
 
             let foundData = null;
-            let finalKeyName = "";
+            let displayKeyName = "";
 
-            // Loop through database keys to find matching Arabic root characters
-            for (let key in fullQuranData) {
-                let cleanKey = key.replace(/\s+/g, '');
-                if (cleanKey === searchKeyNoSpaces || key === searchKeyWithSpaces) {
-                    foundData = fullQuranData[key];
-                    finalKeyName = key;
+            // Loop and compare cleaned keys
+            for (let databaseKey in fullQuranData) {
+                let cleanKey = cleanArabicText(databaseKey);
+                
+                if (cleanKey === cleanInput) {
+                    foundData = fullQuranData[databaseKey];
+                    displayKeyName = databaseKey;
                     break;
                 }
             }
 
-            if (foundData) {
-                // UI updates with database content
-                document.getElementById("statRoot").innerText = finalKeyName;
+            if (foundData && Array.isArray(foundData)) {
+                document.getElementById("statRoot").innerText = displayKeyName;
+                document.getElementById("statFreq").innerText = foundData.length + " Words Found";
                 
-                // If data is an array of words
-                if (Array.isArray(foundData)) {
-                    document.getElementById("statFreq").innerText = foundData.length + " Words Found";
-                    
-                    // Clear previous tags
-                    wordsContainer.innerHTML = "";
-                    
-                    // Generate nice visual blocks for every single derived word
-                    foundData.forEach(word => {
-                        const wordBadge = document.createElement("span");
-                        wordBadge.className = "bg-slate-950 border border-gray-700 hover:border-emerald-500 text-emerald-400 px-4 py-2 rounded-lg font-medium text-lg transition duration-200 arabic-text cursor-default";
-                        wordBadge.innerText = word;
-                        wordsContainer.appendChild(wordBadge);
-                    });
-                } else {
-                    document.getElementById("statFreq").innerText = "Data Available";
-                    wordsContainer.innerHTML = `<p class="text-gray-400 text-sm">Is root ka data list format mein nahi hai.</p>`;
-                }
+                wordsContainer.innerHTML = "";
+                
+                foundData.forEach(word => {
+                    const wordBadge = document.createElement("span");
+                    wordBadge.className = "bg-slate-950 border border-gray-700 hover:border-emerald-500 text-emerald-400 px-4 py-2 rounded-lg font-medium text-lg transition duration-200 arabic-text cursor-default";
+                    wordBadge.innerText = word;
+                    wordsContainer.appendChild(wordBadge);
+                });
 
-                // Show results, hide error block
                 resultDashboard.classList.remove("hidden");
                 errorMsg.classList.add("hidden");
             } else {
-                // In case root is missing or typed incorrectly
                 resultDashboard.classList.add("hidden");
                 errorMsg.classList.remove("hidden");
             }
