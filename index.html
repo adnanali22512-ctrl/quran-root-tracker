@@ -26,7 +26,7 @@
         </header>
 
         <div class="bg-slate-900/60 border border-gray-800 p-6 rounded-2xl shadow-xl mb-8">
-            <label class="block text-gray-400 mb-2 text-sm">Root Letters likhein (Jaise: علم ya ع ل م ya كتب):</label>
+            <label class="block text-gray-400 mb-2 text-sm">Root Letters likhein (Urdu ya Arabic keyboard se, jaise: علم ya كتب ya ارض):</label>
             <div class="flex gap-4">
                 <input type="text" id="searchInput" placeholder="مثال: علم، كتب، ارض" 
                        class="w-full bg-slate-950 border border-gray-700 rounded-xl px-4 py-3 text-right text-xl focus:outline-none focus:border-cyan-500 transition text-emerald-400 font-bold">
@@ -35,7 +35,7 @@
                     تلاش کریں
                 </button>
             </div>
-            <p id="errorMsg" class="text-red-400 text-sm mt-2 hidden">Afsoos! Yeh root word data mein nahi mila. (Mashwara: 'علم' ya 'كتب' ya 'ارض' try karein)</p>
+            <p id="errorMsg" class="text-red-400 text-sm mt-2 hidden">Afsoos! Yeh root word data mein nahi mila. Dobara sahi spelling ke sath try karein.</p>
         </div>
 
         <div id="resultDashboard" class="hidden space-y-6">
@@ -66,11 +66,15 @@
     <script>
         let fullQuranData = null;
 
-        // Arabic cleaning function (Removes Zabar, Zer, Pesh, Tashdeed etc.)
-        function cleanArabicText(text) {
+        // Advanced Normalizer: Converts Urdu/Farsi style Arabic letters into pure Quranic Arabic database format
+        function normalizeArabic(text) {
             return text
-                .replace(/[\u064B-\u0652]/g, "") // Removes harakat (diacritics)
-                .replace(/\s+/g, "")             // Removes all spaces
+                .replace(/[\u064B-\u0652]/g, "") // Removes harakat/diacritics
+                .replace(/ک/g, "ك")             // Converts Urdu Kaaf to Arabic Kaaf
+                .replace(/ی/g, "ي")             // Converts Urdu Yeh to Arabic Yeh
+                .replace(/ے/g, "ي")             // Converts Badi Yeh to Arabic Yeh
+                .replace(/ہ/g, "ه")             // Converts Urdu Gol He to Arabic He
+                .replace(/\s+/g, "")             // Removes spaces
                 .trim();
         }
 
@@ -107,16 +111,16 @@
             const errorMsg = document.getElementById("errorMsg");
             const wordsContainer = document.getElementById("wordsContainer");
 
-            // Clean the user input (No spaces, no harakat)
-            let cleanInput = cleanArabicText(userInput);
+            // Normalize user input
+            let cleanInput = normalizeArabic(userInput);
             if (cleanInput === "") return;
 
             let foundData = null;
             let displayKeyName = "";
 
-            // Loop and compare cleaned keys
+            // Compare against normalized keys of the database
             for (let databaseKey in fullQuranData) {
-                let cleanKey = cleanArabicText(databaseKey);
+                let cleanKey = normalizeArabic(databaseKey);
                 
                 if (cleanKey === cleanInput) {
                     foundData = fullQuranData[databaseKey];
