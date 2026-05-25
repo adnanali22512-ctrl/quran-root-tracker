@@ -3,126 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>القاموس الرقمي - Quranic Root Word Tracker</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Quranic Root Word Tracker</title>
+    <!-- Tailwind CSS for Modern Dark UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        .arabic-font {
-            font-family: 'Amiri', serif;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
+        .arabic-text { font-family: 'Amiri', serif; }
     </style>
 </head>
-<body class="bg-[#050811] text-white min-h-screen overflow-x-hidden">
+<body class="bg-[#0B0F19] text-white min-h-screen p-4 md:p-8">
 
-    <!-- Header / Nav -->
-    <header class="border-b border-slate-900 bg-[#050811]/90 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent arabic-font">
-                    اشتقاق <span class="font-sans text-lg text-slate-400">| Root Tracker</span>
-                </span>
-            </div>
-            <span class="text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3 py-1.5 rounded-full">
-                Beta Version 1.0 (Free)
-            </span>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-6 pt-16 pb-24 relative">
-        <!-- Background Neon Glow -->
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-blue-500/10 blur-[150px] rounded-full -z-10"></div>
-
-        <!-- Heading Section -->
-        <div class="text-center mb-12">
-            <h1 class="text-3xl md:text-5xl font-black mb-4 leading-tight">
-                Quranic Words Ka <span class="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Root Word Tracker</span>
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <header class="text-center my-10">
+            <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-4">
+                قرآنی الفاظ کی جڑ (Root Word Tracker)
             </h1>
-            <p class="text-slate-400 text-base md:text-lg max-w-xl mx-auto">
-                Quran-e-Pak ke alfaaz ki jarr (Root), unki etymology aur unka aapas mein scientific farq samajhne ka modern engine.
-            </p>
-        </div>
+            <p class="text-gray-400">Pure Quran ke root words ka live open-source data aur unke derivatives (words) check karein.</p>
+            <!-- Loading Status Indicator -->
+            <div id="loadingStatus" class="mt-4 text-sm text-yellow-400 font-semibold bg-yellow-400/10 inline-block px-4 py-1 rounded-full border border-yellow-400/20">
+                🔄 Quranic Data Load ho raha hai, bara-e-meharbani intezar karein...
+            </div>
+        </header>
 
         <!-- Search Bar Section -->
-        <div class="max-w-2xl mx-auto mb-8">
-            <div class="relative bg-slate-900/40 border border-slate-800 rounded-2xl p-2 flex items-center focus-within:border-cyan-500/50 transition">
-                <input type="text" placeholder="Koi bhi Arabi lafz ya Root Word likhein (e.g., علم)..." class="bg-transparent w-full px-4 py-3 text-white placeholder-slate-500 focus:outline-none text-right" dir="rtl">
-                <button class="bg-gradient-to-l from-cyan-500 to-blue-600 text-slate-950 font-bold px-6 py-3 rounded-xl hover:opacity-90 transition whitespace-nowrap">
-                    Search
+        <div class="bg-slate-900/60 border border-gray-800 p-6 rounded-2xl shadow-xl mb-8">
+            <label class="block text-gray-400 mb-2 text-sm">Root Letters likhein (Chahe spaces ke sath ya bina spaces ke, jaise: عرض ya ع ر ض):</label>
+            <div class="flex gap-4">
+                <input type="text" id="searchInput" placeholder="مثال: عرض یا کتب" 
+                       class="w-full bg-slate-950 border border-gray-700 rounded-xl px-4 py-3 text-right text-xl focus:outline-none focus:border-cyan-500 transition text-emerald-400 font-bold">
+                <button onclick="searchRoot()" id="searchBtn" disabled
+                        class="bg-gradient-to-l from-emerald-500 to-cyan-500 opacity-50 cursor-not-allowed text-slate-900 font-bold px-8 py-3 rounded-xl transition text-lg">
+                    تلاش کریں
                 </button>
             </div>
+            <p id="errorMsg" class="text-red-400 text-sm mt-2 hidden">Afsoos! Yeh root word data mein nahi mila. Dobara sahi spelling ke sath try karein.</p>
         </div>
 
-        <!-- Trending Roots Quick Links -->
-        <div class="text-center mb-12">
-            <p class="text-xs text-slate-500 uppercase tracking-wider mb-3">Trending Research Roots (Click to Try)</p>
-            <div class="flex flex-wrap justify-center gap-3">
-                <button class="bg-slate-900 border border-slate-800 hover:border-cyan-500/40 px-4 py-2 rounded-xl text-sm transition arabic-font text-cyan-400 font-bold">ء - ر - ض (Ardh)</button>
-                <button class="bg-slate-900 border border-slate-800 hover:border-cyan-500/40 px-4 py-2 rounded-xl text-sm transition arabic-font text-cyan-400 font-bold">خ - ل - ق (Khalaq)</button>
-                <button class="bg-slate-900 border border-slate-800 hover:border-cyan-500/40 px-4 py-2 rounded-xl text-sm transition arabic-font text-cyan-400 font-bold">س - م - و (Samawat)</button>
-            </div>
-        </div>
-
-        <!-- Interactive Result Card (Example Data) -->
-        <div class="bg-gradient-to-b from-slate-900/60 to-slate-900/20 border border-slate-800/80 rounded-3xl p-6 md:p-8 backdrop-blur-sm">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 mb-6 gap-4">
-                <div>
-                    <span class="text-xs font-bold text-cyan-400 bg-cyan-400/10 px-2.5 py-1 rounded-md mb-2 inline-block">Selected Root</span>
-                    <h2 class="text-4xl font-bold arabic-font tracking-widest text-white">ء - ر - ض</h2>
+        <!-- Result Dashboard (Hidden by default) -->
+        <div id="resultDashboard" class="hidden space-y-6">
+            
+            <!-- Quick Stats Top Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-slate-900/40 border border-gray-800/80 p-4 rounded-xl text-center">
+                    <p class="text-xs text-gray-500 mb-1">Selected Root (جڑ)</p>
+                    <h3 id="statRoot" class="text-3xl font-bold text-cyan-400 arabic-text"></h3>
                 </div>
-                <div class="flex gap-4 text-center">
-                    <div class="bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-xl">
-                        <p class="text-xs text-slate-500">Total Frequency</p>
-                        <p class="text-xl font-bold text-white">461 Times</p>
-                    </div>
-                    <div class="bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-xl">
-                        <p class="text-xs text-slate-500">Derived Forms</p>
-                        <p class="text-xl font-bold text-white">1 Noun</p>
-                    </div>
+                <div class="bg-slate-900/40 border border-gray-800/80 p-4 rounded-xl text-center">
+                    <p class="text-xs text-gray-500 mb-1">Total Word Derivatives Count</p>
+                    <h3 id="statFreq" class="text-2xl font-bold text-emerald-400"></h3>
                 </div>
             </div>
 
-            <!-- Detailed Analysis Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Meaning and Concept -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-bold text-slate-300 border-r-2 border-cyan-500 pr-2">Asal Mafhoom (Root Meaning)</h3>
-                    <p class="text-slate-400 leading-relaxed text-sm">
-                        Is root ka asal nishaan kisi aisi cheez ko zahir karna hai jo niche ho, phaili hui ho, ya narm aur thandi ho. Quran mein is se murad hamari Zameen (Earth) hai.
-                    </p>
+            <!-- Meanings & Words Section -->
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Derived Words List from Quran -->
+                <div class="bg-slate-900/50 border border-gray-800 p-6 rounded-xl">
+                    <h4 class="text-lg font-bold text-cyan-400 border-b border-gray-800 pb-2 mb-4 text-right">Is Root se banne wale Quranic Alfaaz (Derivatives):</h4>
+                    <!-- Dynamic tag container -->
+                    <div id="wordsContainer" class="flex flex-wrap gap-2 justify-start direction-ltr" style="direction: ltr;">
+                        <!-- Words will be injected here dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JavaScript & Live API Connection -->
+    <script>
+        // Global variable to hold the downloaded dataset
+        let fullQuranData = null;
+
+        // 1. Fetching the data automatically on page load from CDN
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('https://cdn.jsdelivr.net/gh/AbstractThinker0/quran-roots@main/quranRoots.json')
+                .then(response => {
+                    if (!response.ok) throw new Error("Network response was not ok");
+                    return response.json();
+                })
+                .then(data => {
+                    fullQuranData = data;
                     
-                    <h3 class="text-lg font-bold text-slate-300 border-r-2 border-cyan-500 pr-2">Conceptual Farq (Linguistic Nuance)</h3>
-                    <blockquote class="bg-slate-950/40 p-4 rounded-xl border border-slate-900 text-sm text-slate-400 italic">
-                        <strong>Al-Ardh (الأرض) vs Ad-Dunya (الدنيا):</strong> Quran mein 'Ardh' physical zameen (crust/planet) ke liye aata hai, jabke 'Dunya' us par mojud aam zindagi ya insani ehsaasaat ke liye istemal hota hai. Both are different concepts!
-                    </blockquote>
-                </div>
-
-                <!-- Scientific & Tech Angle -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-bold text-slate-300 border-r-2 border-blue-500 pr-2">Scientific & Physics Correlation</h3>
-                    <p class="text-slate-400 leading-relaxed text-sm">
-                        Modern geology ke mutabiq zameen ki outer layer (crust) narm aur phaili hui hai jo baki androoni layers ke muqable thandi hai. Quran ka lafz 'Ardh' isi phailao aur narm bichonay (Lithosphere) ki taraf ishara karta hai.
-                    </p>
+                    // UI Changes after data successfully loads
+                    document.getElementById("loadingStatus").innerHTML = "✅ Live Quranic Database Connect Ho Gaya Hai!";
+                    document.getElementById("loadingStatus").classList.replace("text-yellow-400", "text-emerald-400");
+                    document.getElementById("loadingStatus").classList.replace("bg-yellow-400/10", "bg-emerald-400/10");
+                    document.getElementById("loadingStatus").classList.replace("border-yellow-400/20", "border-emerald-400/20");
                     
-                    <div class="pt-2">
-                        <a href="https://forms.google.com" target="_blank" class="inline-flex items-center gap-2 text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl hover:bg-blue-500/20 transition">
-                            <span>Suggest a Research Mapping</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+                    // Enable the Search Button
+                    const btn = document.getElementById("searchBtn");
+                    btn.disabled = false;
+                    btn.classList.remove("opacity-50", "cursor-not-allowed");
+                })
+                .catch(error => {
+                    console.error("Data load karne mein masla:", error);
+                    document.getElementById("loadingStatus").innerHTML = "❌ Data load nahi ho saka. Page refresh karein.";
+                    document.getElementById("loadingStatus").classList.replace("text-yellow-400", "text-red-400");
+                });
+        });
 
-    <!-- Footer -->
-    <footer class="text-center py-6 border-t border-slate-950 text-xs text-slate-600">
-        &copy; 2026 Quranic Root Tracker. Built completely Free for the Ummah.
-    </footer>
+        // 2. Comprehensive Search Logic
+        function searchRoot() {
+            if (!fullQuranData) return;
 
+            let input = document.getElementById("searchInput").value.trim();
+            const resultDashboard = document.getElementById("resultDashboard");
+            const errorMsg = document.getElementById("errorMsg");
+            const wordsContainer = document.getElementById("wordsContainer");
+
+            if (input === "") return;
+
+            // Clean data helpers: standardizing user input with or without spaces
+            let searchKeyWithSpaces = input.split('').filter(char => char.trim() !== '').join(' ');
+            let searchKeyNoSpaces = input.replace(/\s+/g, '');
+
+            let foundData = null;
+            let finalKeyName = "";
+
+            // Loop through database keys to find matching Arabic root characters
+            for (let key in fullQuranData) {
+                let cleanKey = key.replace(/\s+/g, '');
+                if (cleanKey === searchKeyNoSpaces || key === searchKeyWithSpaces) {
+                    foundData = fullQuranData[key];
+                    finalKeyName = key;
+                    break;
+                }
+            }
+
+            if (foundData) {
+                // UI updates with database content
+                document.getElementById("statRoot").innerText = finalKeyName;
+                
+                // If data is an array of words
+                if (Array.isArray(foundData)) {
+                    document.getElementById("statFreq").innerText = foundData.length + " Words Found";
+                    
+                    // Clear previous tags
+                    wordsContainer.innerHTML = "";
+                    
+                    // Generate nice visual blocks for every single derived word
+                    foundData.forEach(word => {
+                        const wordBadge = document.createElement("span");
+                        wordBadge.className = "bg-slate-950 border border-gray-700 hover:border-emerald-500 text-emerald-400 px-4 py-2 rounded-lg font-medium text-lg transition duration-200 arabic-text cursor-default";
+                        wordBadge.innerText = word;
+                        wordsContainer.appendChild(wordBadge);
+                    });
+                } else {
+                    document.getElementById("statFreq").innerText = "Data Available";
+                    wordsContainer.innerHTML = `<p class="text-gray-400 text-sm">Is root ka data list format mein nahi hai.</p>`;
+                }
+
+                // Show results, hide error block
+                resultDashboard.classList.remove("hidden");
+                errorMsg.classList.add("hidden");
+            } else {
+                // In case root is missing or typed incorrectly
+                resultDashboard.classList.add("hidden");
+                errorMsg.classList.remove("hidden");
+            }
+        }
+    </script>
 </body>
 </html>
